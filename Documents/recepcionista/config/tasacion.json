@@ -1,0 +1,44 @@
+{
+  "familias": {
+    "iPhone": {
+      "min": 50,
+      "max": 400,
+      "nota": "Varía mucho por generación"
+    },
+    "Samsung Galaxy": {
+      "min": 40,
+      "max": 300,
+      "nota": "Smartphones Android"
+    },
+    "MacBook": {
+      "min": 400,
+      "max": 1200,
+      "nota": "Edición y año determinan precio"
+    },
+    "iPad": {
+      "min": 100,
+      "max": 600,
+      "nota": "Generación importante"
+    },
+    "Portátil genérico": {
+      "min": 100,
+      "max": 600,
+      "nota": "Procesador y RAM clave"
+    },
+    "PlayStation": {
+      "min": 150,
+      "max": 450,
+      "nota": "Versión y controles afectan"
+    },
+    "Nintendo Switch": {
+      "min": 150,
+      "max": 350,
+      "nota": "Standard o OLED"
+    },
+    "Monitor/TV": {
+      "min": 50,
+      "max": 300,
+      "nota": "Tamaño y resolución"
+    }
+  }
+}

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Brujita — Panel de Recepción</title>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+      color: #333;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    header {
+      background: #CB511C;
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    h1 { font-size: 28px; }
+    .subtitle { font-size: 14px; opacity: 0.9; margin-top: 5px; }
+
+    .section {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #122B49;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #CB511C;
+      padding-bottom: 10px;
+    }
+
+    .recado-item {
+      border-left: 4px solid #CB511C;
+      padding: 15px;
+      margin-bottom: 10px;
+      background: #fafafa;
+      border-radius: 4px;
+    }
+    .recado-urgente {
+      border-left-color: #d32f2f;
+      background: #ffebee;
+    }
+    .recado-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 10px;
+    }
+    .recado-nombre { font-weight: 600; color: #122B49; }
+    .recado-urgencia {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .urgencia-normal { background: #e3f2fd; color: #1976d2; }
+    .urgencia-alta { background: #ffebee; color: #d32f2f; }
+    .recado-info { font-size: 14px; color: #666; margin: 5px 0; }
+    .recado-motivo { margin-top: 10px; line-height: 1.5; }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: #CB511C; color: white; }
+    .btn-primary:hover { background: #a83e15; }
+    .btn-secondary { background: #122B49; color: white; }
+    .btn-secondary:hover { background: #0d1a2f; }
+
+    .llamada-item {
+      border-bottom: 1px solid #eee;
+      padding: 12px 0;
+    }
+    .llamada-item:last-child { border-bottom: none; }
+    .llamada-header {
+      display: flex;
+      justify-content: space-between;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+    .llamada-header:hover { background: #f5f5f5; }
+    .llamada-duracion { font-size: 12px; color: #999; }
+    .llamada-transcript {
+      background: #f9f9f9;
+      padding: 12px;
+      border-radius: 4px;
+      margin-top: 8px;
+      font-size: 13px;
+      line-height: 1.5;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .consultas-tabla {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .consultas-tabla th {
+      background: #f5f5f5;
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      color: #122B49;
+      border-bottom: 2px solid #ddd;
+    }
+    .consultas-tabla td {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+    }
+    .consultas-tabla tbody tr:hover { background: #f9f9f9; }
+
+    .empty { text-align: center; color: #999; padding: 20px; }
+
+    @media (max-width: 768px) {
+      .container { padding: 10px; }
+      h1 { font-size: 20px; }
+      .section-title { font-size: 16px; }
+      .recado-header { flex-direction: column; }
+      .consultas-tabla { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" x-data="panel()">
+    <header>
+      <h1>La Brujita</h1>
+      <p class="subtitle">Panel de Recepción — Últimos recados y llamadas</p>
+    </header>
+
+    <!-- RECADOS PENDIENTES -->
+    <div class="section">
+      <div class="section-title">📞 Recados Pendientes</div>
+      <template x-if="recados.length === 0">
+        <div class="empty">No hay recados pendientes</div>
+      </template>
+      <template x-for="recado in recados" :key="recado.id">
+        <div class="recado-item" :class="recado.urgencia === 'alta' ? 'recado-urgente' : ''">
+          <div class="recado-header">
+            <div>
+              <div class="recado-nombre" x-text="recado.nombre"></div>
+              <span class="recado-urgencia" :class="recado.urgencia === 'alta' ? 'urgencia-alta' : 'urgencia-normal'" x-text="recado.urgencia.toUpperCase()"></span>
+            </div>
+          </div>
+          <div class="recado-info">📱 <x-text x-text="recado.telefono"></x-text></div>
+          <div class="recado-motivo" x-text="recado.motivo"></div>
+          <div class="recado-info" style="margin-top: 10px; font-size: 12px;">
+            <x-text x-text="new Date(recado.creado_en).toLocaleString('es-ES')"></x-text>
+          </div>
+          <button class="btn btn-primary" style="margin-top: 10px;" @click="marcarAtendido(recado.id)">✓ Atendido</button>
+        </div>
+      </template>
+    </div>
+
+    <!-- ÚLTIMAS LLAMADAS -->
+    <div class="section">
+      <div class="section-title">📞 Últimas Llamadas</div>
+      <template x-if="llamadas.length === 0">
+        <div class="empty">No hay llamadas</div>
+      </template>
+      <template x-for="llamada in llamadas" :key="llamada.id">
+        <div class="llamada-item">
+          <div class="llamada-header" @click="llamada.expandida = !llamada.expandida">
+            <div>
+              <strong x-text="llamada.telefono || 'Desconocido'"></strong>
+              <br>
+              <small x-text="llamada.resumen || '(sin resumen)'"></small>
+            </div>
+            <div style="text-align: right;">
+              <div class="llamada-duracion" x-text="`${Math.round(llamada.duracion_seg / 60)}m ${llamada.duracion_seg % 60}s`"></div>
+              <div class="llamada-duracion" x-text="new Date(llamada.inicio).toLocaleString('es-ES')"></div>
+            </div>
+          </div>
+          <template x-if="llamada.expandida">
+            <div class="llamada-transcript" x-html="llamada.transcripcion_html || 'Sin transcripción disponible'"></div>
+          </template>
+        </div>
+      </template>
+    </div>
+
+    <!-- CONSULTAS SIN RESULTADO -->
+    <div class="section">
+      <div class="section-title">❓ Preguntas sin resultado (últimos 30 días)</div>
+      <template x-if="consultas.length === 0">
+        <div class="empty">No hay consultas sin resultado</div>
+      </template>
+      <template x-if="consultas.length > 0">
+        <table class="consultas-tabla">
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Consulta</th>
+              <th>Frecuencia</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template x-for="consulta in consultas" :key="`${consulta.tipo}-${consulta.consulta}`">
+              <tr>
+                <td x-text="consulta.tipo"></td>
+                <td x-text="consulta.consulta"></td>
+                <td style="text-align: center;" x-text="consulta.frecuencia"></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </template>
+    </div>
+  </div>
+
+  <script>
+    function panel() {
+      return {
+        recados: [],
+        llamadas: [],
+        consultas: [],
+
+        async init() {
+          this.cargarRecados();
+          this.cargarLlamadas();
+          this.cargarConsultas();
+          setInterval(() => this.cargarRecados(), 30000);
+          setInterval(() => this.cargarLlamadas(), 60000);
+        },
+
+        async cargarRecados() {
+          try {
+            const res = await fetch('/api/recados');
+            this.recados = await res.json();
+          } catch (e) {
+            console.error('Error cargando recados:', e);
+          }
+        },
+
+        async cargarLlamadas() {
+          try {
+            const res = await fetch('/api/llamadas');
+            const data = await res.json();
+            this.llamadas = data.map(l => ({
+              ...l,
+              expandida: false,
+              transcripcion_html: l.transcripcion ? this.formatearTranscripcion(JSON.parse(l.transcripcion)) : 'Sin transcripción'
+            }));
+          } catch (e) {
+            console.error('Error cargando llamadas:', e);
+          }
+        },
+
+        async cargarConsultas() {
+          try {
+            const res = await fetch('/api/consultas-sin-resultado');
+            this.consultas = await res.json();
+          } catch (e) {
+            console.error('Error cargando consultas:', e);
+          }
+        },
+
+        formatearTranscripcion(transcript) {
+          return transcript.map(m => `<strong>${m.role}:</strong> ${m.content}`).join('<br>');
+        },
+
+        async marcarAtendido(id) {
+          try {
+            await fetch(`/api/recados/${id}/atendido`, { method: 'PATCH' });
+            this.cargarRecados();
+          } catch (e) {
+            console.error('Error marcando atendido:', e);
+          }
+        }
+      };
+    }
+
+    document.addEventListener('alpine:init', () => {
+      document.querySelector('[x-data="panel()"]')?.__x?.init?.();
+    });
+  </script>
+</body>
+</html>
