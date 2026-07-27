@@ -20,17 +20,22 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Inicializar BD
-initDb();
+// Inicializar BD al iniciar
+let dbReady = false;
+initDb().then(() => {
+  dbReady = true;
+  console.log('✅ Base de datos iniciada');
+}).catch(err => {
+  console.error('❌ Error inicializando BD:', err);
+  process.exit(1);
+});
 
 // ============ HEALTH CHECK ============
 app.get('/health', (req, res) => {
-  try {
-    db.prepare('SELECT 1').get();
-    res.json({ ok: true, db: 'ok' });
-  } catch (error) {
-    res.status(500).json({ ok: false, error: error.message });
+  if (!dbReady) {
+    return res.status(503).json({ ok: false, db: 'initializing' });
   }
+  res.json({ ok: true, db: 'ok' });
 });
 
 // ============ TOOLS (ElevenLabs) ============
